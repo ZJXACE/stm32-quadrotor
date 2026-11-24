@@ -15,7 +15,7 @@ void Int_Motor_SetSpeed(Motor_Struct *motor)
         return;
     }
     //设置速度,用到设置占空比,函数:_HAL_TIM_set_compare
-    __HAL_TIM_SetCompare(motor->htim, motor->channel, motor->speed);//因为要用到句柄,通道,速度,所以.h文件里的结构体要存这三
+    __HAL_TIM_SET_COMPARE(motor->htim, motor->channel, motor->speed);//因为要用到句柄,通道,速度,所以.h文件里的结构体要存这三
     
 }
 

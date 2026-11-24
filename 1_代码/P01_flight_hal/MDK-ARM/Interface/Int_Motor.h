@@ -1,5 +1,5 @@
 #ifndef __INT_MOTOR_H__
-#define __INT_MOTOR_H_
+#define __INT_MOTOR_H__
 
 #include "main.h"
 #include "tim.h"
@@ -13,7 +13,7 @@ typedef struct
     //存一下通道
     uint16_t channel;
     //存一下速度
-    uint8_t speed;
+    uint16_t speed;
 }Motor_Struct;
 
 
