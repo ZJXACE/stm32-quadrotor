@@ -46,7 +46,7 @@
 #define configTICK_RATE_HZ			( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES		( 5 )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) 128 )
-#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 17 * 1024 ) )
+#define configTOTAL_HEAP_SIZE		( ( size_t ) ( 12 * 1024 ) )//给12K给操作系统
 #define configMAX_TASK_NAME_LEN		( 16 )
 #define configUSE_TRACE_FACILITY	0
 #define configUSE_16_BIT_TICKS		0
@@ -77,6 +77,13 @@ priority values, 0 to 15.  This must correspond to the
 configKERNEL_INTERRUPT_PRIORITY setting.  Here 15 corresponds to the lowest
 NVIC value of 255. */
 #define configLIBRARY_KERNEL_INTERRUPT_PRIORITY	15
+
+//配置pendsv,svc systick的宏定义
+#define xPortPendSVHandler PendSV_Handler
+#define vPortSVCHandler SVC_Handler
+//打开能够查询freertos是否调用的宏
+#define INCLUDE_xTaskGetSchedulerState 1
+
 
 #endif /* FREERTOS_CONFIG_H */
 

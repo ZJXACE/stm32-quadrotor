@@ -1,0 +1,17 @@
+#ifndef __INT_IP5305T_H__
+#define __INT_IP5305T_H__
+
+#include "main.h"
+#include "FreeRTOS.h"
+#include "task.h"
+/**
+ * @brief 启动IP5305T电源,避免自动关机
+ * 
+ * @param None 
+ * @retval None
+ */
+
+void Int_IP5305T_Start(void);
+
+
+#endif

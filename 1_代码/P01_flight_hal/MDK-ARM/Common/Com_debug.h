@@ -21,11 +21,10 @@
 /* Keil 里 __FILE__ 是 "..\Core\Src\main.c" 这种完整路径，
  * 用 strrchr 从后往前找最后一个分隔符，只留文件名，打印更简短 */
 #define FILE_NAME   (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-#define FILE_NAME_  (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : \
-                     (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__))
+#define FILE_NAME_  (strrchr(FILE_NAME, '/') ? strrchr(FILE_NAME, '/') + 1 : FILE_NAME)
 
 /* 打印格式：[main.c:92] 你的内容 */
-#define Debug_Printf(format, ...)  printf("[%s:%d]" format "\r\n", FILE_NAME_, __LINE__, ##__VA_ARGS__)
+#define Debug_Printf(format, ...)  printf("[%s:%d]" format, FILE_NAME_, __LINE__, ##__VA_ARGS__)
 
 #else
 

@@ -7,6 +7,7 @@
 
 # ---------- Keil MDK 的编译输出目录（整个目录都是产物） ----------
 MDK-ARM/P01_flight_hal/
+MDK-ARM/P02_remote_hal/
 
 # ---------- Keil 单文件产物（防止输出目录改名后漏网） ----------
 *.o
@@ -30,6 +31,7 @@ MDK-ARM/P01_flight_hal/
 # ---------- Keil 与本机绑定的个人配置（换台电脑就没用了） ----------
 *.uvguix.*
 *.uvoptx
+*.24476
 
 # ---------- VS Code / Keil Assistant 的临时日志与锁文件 ----------
 *.log
