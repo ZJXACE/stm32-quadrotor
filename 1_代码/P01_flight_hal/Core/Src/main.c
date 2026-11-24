@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "APP_freertos_task.h"   /* App_Freertos_Start() 的声明，不包含会触发隐式声明警告 */
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
