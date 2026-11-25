@@ -22,6 +22,7 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
+#include "Int_SI24R1.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -97,7 +98,8 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   
-  
+  //测试SI24R1硬件初始化
+  Int_SI24R1_Init();
   //启动freertos操作系统
   App_Freertos_Start();
 

@@ -2,6 +2,11 @@
 #define __nRF24L01P__
 
 #include "spi.h"
+#include "main.h"
+#include "FreeRTOS.h"
+#include "task.h"
+#include "Com_debug.h"
+
 
 //SI24R1引脚更改
 
@@ -104,6 +109,7 @@ uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf);
 
 //硬件接口层的初始化
 void Int_SI24R1_Init(void);
+uint8_t Int_SI24R1_Check(void);
 //********************************************************************************************************************//
 #endif
 

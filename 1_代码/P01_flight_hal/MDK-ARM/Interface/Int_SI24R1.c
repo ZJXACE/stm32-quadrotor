@@ -1,6 +1,6 @@
 #include "Int_SI24R1.h"
 //SI24R1发送地址和接受地址是同一个地址
-uint8_t  TX_ADDRESS[TX_ADR_WIDTH] = {0x0A,0x01,0x06,0x0E,0x01};  // 定义一个静态发送地址
+uint8_t  TX_ADDRESS[TX_ADR_WIDTH] = {0x0A,0x01,0x08,0x0E,0x01};  // 定义一个静态发送地址
 
 
 static uint8_t SPI_RW(uint8_t byte)
@@ -150,7 +150,7 @@ uint8_t Int_SI24R1_RxPacket(uint8_t *rxbuf)
 {
 	uint8_t state;
 	state = Int_SI24R1_Read_Reg(STATUS);  			                 //读取状态寄存器的值    	  
-	Int_SI24R1_Write_Reg(SI24R1_WRITE_REG + STATUS,state);               //清除RX_DS中断标志
+	Int_SI24R1_Write_Reg(SI24R1_WRITE_REG + STATUS, state);          //清除RX_DS中断标志
 
 	if(state & RX_DR)								                           //接收到数据
 	{
@@ -170,7 +170,6 @@ uint8_t Int_SI24R1_RxPacket(uint8_t *rxbuf)
 uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 {
 	uint8_t state;
-	uint32_t t0 = HAL_GetTick();
 	CE_LOW;																										  //CE拉低，使能SI24R1配置
 	Int_SI24R1_Write_Buf(WR_TX_PLOAD, txbuf, TX_PLOAD_WIDTH);	    //写数据到TX FIFO,32个字节
  	CE_HIGH;																										  //CE置高，使能发送	   
@@ -179,11 +178,6 @@ uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 	state = Int_SI24R1_Read_Reg(STATUS);
 	while((state&TX_DS)==0&&(state&MAX_RT)==0)//读取状态寄存器的值
 	{
-		if(HAL_GetTick() - t0 > 20)                 //20ms 超时：视为失败
-		{
-			Int_SI24R1_Write_Reg(FLUSH_TX,0xff);    //清掉残留包,防止下次被带出去
-			break;
-		}
 		state = Int_SI24R1_Read_Reg(STATUS);//没值的时候就一直读,一直读
 
 	}  											 	   
@@ -199,5 +193,44 @@ uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 		return 0;
 	}
 	return 1;							//发送失败															  
+}
+
+//搞一个接收数组
+uint8_t RXBUFF[5]={0};
+
+//核对发送接收是否成功
+uint8_t Int_SI24R1_Check(void)
+{
+    //写入发送地址
+	Int_SI24R1_Write_Buf(SI24R1_WRITE_REG + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
+
+	//读取同样地址
+	Int_SI24R1_Read_Buf(SI24R1_READ_REG + TX_ADDR, RXBUFF, TX_ADR_WIDTH);
+
+
+	for(uint8_t i=0;i<TX_ADR_WIDTH;i++)
+	{
+		if(RXBUFF[i]!=TX_ADDRESS[i])
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+//硬件初始化测试
+void Int_SI24R1_Init(void)
+{
+	//等待check成功返回0
+	while(Int_SI24R1_Check()!=0)
+	{
+		//等待10ms
+		HAL_Delay(10);
+	}
+
+	Debug_Printf("SI24R1 Init Success\n");
+
+	//每次默认是接收状态
+	Int_SI24R1_RX_Mode();
+	
 }
 
