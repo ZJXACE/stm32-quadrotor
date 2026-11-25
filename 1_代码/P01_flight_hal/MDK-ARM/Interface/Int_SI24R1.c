@@ -170,6 +170,7 @@ uint8_t Int_SI24R1_RxPacket(uint8_t *rxbuf)
 uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 {
 	uint8_t state;
+	uint32_t timeout = 50000;
 	CE_LOW;																										  //CE拉低，使能SI24R1配置
 	Int_SI24R1_Write_Buf(WR_TX_PLOAD, txbuf, TX_PLOAD_WIDTH);	    //写数据到TX FIFO,32个字节
  	CE_HIGH;																										  //CE置高，使能发送	   
@@ -178,6 +179,7 @@ uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 	state = Int_SI24R1_Read_Reg(STATUS);
 	while((state&TX_DS)==0&&(state&MAX_RT)==0)//读取状态寄存器的值
 	{
+		if(--timeout == 0) break;
 		state = Int_SI24R1_Read_Reg(STATUS);//没值的时候就一直读,一直读
 
 	}  											 	   
