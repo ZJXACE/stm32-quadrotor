@@ -6,25 +6,32 @@ Motor_Struct LEFT_1_motor={.htim = &htim4,.channel = TIM_CHANNEL_4,.speed = 200}
 Motor_Struct RIGHT_0_motor={.htim = &htim2,.channel = TIM_CHANNEL_2,.speed = 200};
 Motor_Struct RIGHT_1_motor={.htim = &htim1,.channel = TIM_CHANNEL_3,.speed = 200};
 
+//led结构体实现四个led
+Led_Struct led={.GPIOx = LED1_GPIO_Port,.Pin = LED1_Pin};//LED1 = PA12，原来写的 PA0 不是 LED
 
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------
 //电源管理系统参数
 void Int_IP5305T_Task(void *pvParameters);
 #define INT_IP5305T_STACK_SIZE 128
 #define INT_IP5305T_PRIORITYIO 4
 TaskHandle_t INT_IP5305T_hande;
-
+#define POWER_task_period 10000
+//----------------------------------------------------------------------------------------------------------------------------------------------------
 //电机飞行参数
 void Int_Motor_Task(void *pvParameters);
 #define INT_MOTOR_STACK_SIZE 128
 #define INT_MOTOR_PRIORITYIO 3
 TaskHandle_t INT_MOTOR_hande; 
-
-
-
-//定义任务的周期
-#define POWER_task_period 10000
 #define MOTOR_task_period 6
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+//led参数
+void Int_Led_Task(void *pvParameters);
+#define INT_LED_STACK_SIZE 128
+#define INT_LED_PRIORITYIO 1//优先级给1
+TaskHandle_t INT_LED_hande;
+#define LED_task_period 100
+
+
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -38,10 +45,13 @@ void App_Freertos_Start(void)
     //创建电机飞行任务
     xTaskCreate(Int_Motor_Task, "Int_Motor_Task", INT_MOTOR_STACK_SIZE, NULL, INT_MOTOR_PRIORITYIO, &INT_MOTOR_hande);
 
+    //创建led任务
+    xTaskCreate(Int_Led_Task, "Int_Led_Task", INT_LED_STACK_SIZE, NULL, INT_LED_PRIORITYIO, &INT_LED_hande);
+
     // 启动任务调度器
     vTaskStartScheduler();
 }
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------
 //电机启动任务
 void Int_Motor_Task(void *pvParameters)
 {
@@ -58,10 +68,7 @@ void Int_Motor_Task(void *pvParameters)
         vTaskDelayUntil(&lastWakeTime, MOTOR_task_period);
     }
 }
-
-
-
-
+//----------------------------------------------------------------------------------------------------------------------------------------------------
 //电源管理系统任务
 void Int_IP5305T_Task(void *pvParameters)
 {
@@ -76,4 +83,16 @@ void Int_IP5305T_Task(void *pvParameters)
 
      }    
 }
+//----------------------------------------------------------------------------------------------------------------------------------------------------
+//led任务
+void Int_Led_Task(void *pvParameters)
+{
+    portTickType lastWakeTime = xTaskGetTickCount();
+    while (1)
+    {
+        //led打开
+        Int_led_on(&led);
 
+        vTaskDelayUntil(&lastWakeTime, LED_task_period);
+    }
+}
