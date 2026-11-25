@@ -227,7 +227,7 @@ void Int_SI24R1_Init(void)
 		HAL_Delay(10);
 	}
 
-	Debug_Printf("SI24R1 Init Success\n");
+	Debug_Printf("SI24R1 Init Success!\n");
 
 	//每次默认是接收状态
 	Int_SI24R1_RX_Mode();
