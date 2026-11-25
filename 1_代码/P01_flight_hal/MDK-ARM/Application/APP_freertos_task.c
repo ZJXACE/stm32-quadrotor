@@ -7,8 +7,15 @@ Motor_Struct RIGHT_0_motor={.htim = &htim2,.channel = TIM_CHANNEL_2,.speed = 200
 Motor_Struct RIGHT_1_motor={.htim = &htim1,.channel = TIM_CHANNEL_3,.speed = 200};
 
 //led结构体实现四个led
-Led_Struct led={.GPIOx = LED1_GPIO_Port,.Pin = LED1_Pin};//LED1 = PA12，原来写的 PA0 不是 LED
+Led_Struct LEFT_TOP_LED={.GPIOx = LED1_GPIO_Port,.Pin = LED1_Pin};//LED1 = PA12，原来写的 PA0 不是 LED
+Led_Struct RIGHT_TOP_LED={.GPIOx = LED2_GPIO_Port,.Pin = LED2_Pin};//LED2 = PA11，原来写的 PA0 不是 LED
+Led_Struct RIGHT_BOTTOM_LED={.GPIOx = LED3_GPIO_Port,.Pin = LED3_Pin};//LED3 = PB15，原来写的 PB0 不是 LED
+Led_Struct LEFT_BOTTOM_LED={.GPIOx = LED4_GPIO_Port,.Pin = LED4_Pin};//LED4 = PB14，原来写的 PB0 不是 LED
 
+//遥控器连接状态
+RemoteControl_Status remote_control_status = REMOTE_CONTROL_CONNECTED;
+//飞机飞行状态
+Plane_Status plane_state = Error;
 //----------------------------------------------------------------------------------------------------------------------------------------------------
 //电源管理系统参数
 void Int_IP5305T_Task(void *pvParameters);
@@ -87,11 +94,61 @@ void Int_IP5305T_Task(void *pvParameters)
 //led任务
 void Int_Led_Task(void *pvParameters)
 {
+    uint8_t Count = 0;
     portTickType lastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        //led打开
-        Int_led_on(&led);
+        Count++;
+        //前面两个灯
+       //遥控器连接则前面两个灯常亮
+       if(remote_control_status == REMOTE_CONTROL_CONNECTED)
+       {
+        Int_led_on(&LEFT_TOP_LED);
+        Int_led_on(&RIGHT_TOP_LED);
+       }
+       else//否则前面两个灯熄灭
+       {
+        Int_led_off(&LEFT_TOP_LED);
+        Int_led_off(&RIGHT_TOP_LED);
+       }
+
+       //后面两个灯
+       //飞机飞行状态为空闲状态
+       if(plane_state == IDLE)
+       {
+
+        //后面两个灯慢闪,500ms切换一次
+        if(Count % 5 == 0)
+        {
+            Int_led_toggle(&LEFT_BOTTOM_LED);
+            Int_led_toggle(&RIGHT_BOTTOM_LED);
+        }
+       }
+       else if(plane_state == FLIGHT)
+       {
+        //后面两个灯快闪,200ms切换一次
+        if(Count % 2 == 0)
+        {
+            Int_led_toggle(&LEFT_BOTTOM_LED);
+            Int_led_toggle(&RIGHT_BOTTOM_LED);
+        }
+       }
+       else if(plane_state == Fix_Height)
+       {
+        //后面两个灯常亮
+        Int_led_on(&LEFT_BOTTOM_LED);
+        Int_led_on(&RIGHT_BOTTOM_LED);
+       }
+       else if(plane_state == Error)
+       {
+        //后面两个灯熄灭
+        Int_led_off(&LEFT_BOTTOM_LED);
+        Int_led_off(&RIGHT_BOTTOM_LED);
+       }
+       if(Count==10)
+       {
+        Count = 0;
+       }
 
         vTaskDelayUntil(&lastWakeTime, LED_task_period);
     }

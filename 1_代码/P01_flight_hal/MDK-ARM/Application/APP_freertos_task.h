@@ -7,6 +7,7 @@
 #include "Int_IP5305T.h"
 #include "Int_Motor.h"
 #include "Int_Led.h"
+#include "Com_config.h"
 
 /**
  * @brief  启动freertos操作
