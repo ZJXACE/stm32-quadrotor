@@ -8,7 +8,7 @@
 #include "Int_Motor.h"
 #include "Int_Led.h"
 #include "Com_config.h"
-
+#include "Int_SI24R1.h"
 /**
  * @brief  启动freertos操作
  * @retval None

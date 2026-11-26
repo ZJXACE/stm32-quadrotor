@@ -202,6 +202,7 @@ uint8_t RXBUFF[5]={0};
 uint8_t Int_SI24R1_Check(void)
 {
     //写入发送地址
+	Int_SI24R1_Read_Buf(SI24R1_READ_REG + TX_ADDR, RXBUFF, TX_ADR_WIDTH);   // 先读一次（丢弃首帧）
 	Int_SI24R1_Write_Buf(SI24R1_WRITE_REG + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
 
 	//读取同样地址
@@ -220,6 +221,7 @@ uint8_t Int_SI24R1_Check(void)
 //硬件初始化测试
 void Int_SI24R1_Init(void)
 {
+	HAL_Delay(200);   // 上电后芯片需要 >100ms（手册 P6）
 	//等待check成功返回0
 	while(Int_SI24R1_Check()!=0)
 	{

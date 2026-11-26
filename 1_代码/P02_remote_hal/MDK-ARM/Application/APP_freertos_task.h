@@ -5,6 +5,7 @@
 #include "task.h"
 #include "com_debug.h"
 #include "Int_IP5305T.h"
+#include "Int_SI24R1.h"
 
 
 /**

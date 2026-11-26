@@ -22,11 +22,12 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "Int_SI24R1.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "APP_freertos_task.h"   /* App_Freertos_Start() 的声明，不包含会触发隐式声明警告 */
+#include "Int_SI24R1.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
