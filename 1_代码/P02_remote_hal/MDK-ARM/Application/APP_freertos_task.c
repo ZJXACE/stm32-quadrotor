@@ -1,6 +1,6 @@
 #include "APP_freertos_task.h"
 
-//创建电源管理任务,�?10S拉低�?次电�?,使得其继续工�?
+//创建电源管理任务，每 10S 拉低一次电平，使得其继续工作
 void Power_Manage_Task(void *pvParameters);
 #define POWER_MANAGE_STACK_SIZE 128
 #define POWER_MANAGE_PRIORITYIO 4
@@ -25,7 +25,7 @@ void App_Freertos_Start(void)
    
     //创建通讯任务
     xTaskCreate(Comm_Task, "Comm_Task", COMM_STACK_SIZE, NULL, COMM_PRIORITYIO, &comm_hande);
-    // 启动任务调度�?
+    //启动任务调度器
     vTaskStartScheduler();
 }
 
@@ -40,9 +40,9 @@ void Comm_Task(void *pvParameters)
     portTickType lastWakeTime = xTaskGetTickCount();
     while (1)
     {
-        //1.要发送之前要先进入发送模�?
+        //1.要发送之前要先进入发送模式
         Int_SI24R1_TX_Mode();
-        //2.发�?�数�?
+        //2.发送数据
        
         Com_buff[0] = 'h';
         Com_buff[1] = 'i';
@@ -52,9 +52,9 @@ void Comm_Task(void *pvParameters)
         Com_buff[5] = 'r';
 
         uint8_t r = Int_SI24R1_TxPacket(Com_buff);
-        Debug_Printf("TX ret=%d\r\n", r);   // 0=�Է���ACK 1=�ط����� 2=��ʱ
+        Debug_Printf("TX ret=%d\r\n", r);   //0=对方回ACK 1=重发超限 2=超时
 
-        //发�?�完成后恢复到RX模式
+        //发送完成后恢复到 RX 模式
         Int_SI24R1_RX_Mode();
 
         //获取基准时间延迟
@@ -72,8 +72,8 @@ void Power_Manage_Task(void *pvParameters)
     portTickType lastWakeTime = xTaskGetTickCount();
     while (1)
     {
-       //�?10S拉低�?次电�?,使得其继续工�?
-       //用taskdelayuntil来进行定�?
+       //每 10S 拉低一次电平，使得其继续工作
+       //用 taskdelayuntil 来进行定时
        vTaskDelayUntil(&lastWakeTime, POWER_MANAGE_PERIOD);
 
        //执行电源管理任务
