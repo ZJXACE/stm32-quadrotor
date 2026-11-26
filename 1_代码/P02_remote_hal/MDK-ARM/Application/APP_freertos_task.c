@@ -11,8 +11,13 @@ void Comm_Task(void *pvParameters);
 #define COMM_STACK_SIZE 128
 #define COMM_PRIORITYIO 3
 TaskHandle_t comm_hande;
-//任务周期
 #define COMM_PERIOD 6
+//创建按键任务
+void Key_Task(void *pvParameters);
+#define KEY_STACK_SIZE 128
+#define KEY_PRIORITYIO 2
+TaskHandle_t key_hande;
+#define KEY_PERIOD 20
 
 
 
@@ -25,14 +30,34 @@ void App_Freertos_Start(void)
    
     //创建通讯任务
     xTaskCreate(Comm_Task, "Comm_Task", COMM_STACK_SIZE, NULL, COMM_PRIORITYIO, &comm_hande);
+
+    //创建按键任务
+    xTaskCreate(Key_Task, "Key_Task", KEY_STACK_SIZE, NULL, KEY_PRIORITYIO, &key_hande);
+
     //启动任务调度器
     vTaskStartScheduler();
 }
 
+//按键任务
+void Key_Task(void *pvParameters)
+{
+    portTickType lastWakeTime = xTaskGetTickCount();
+    while(1)
+    {
+        KEY_type key = Int_Key_Get();
+        if(key != KEY_NONE)
+        {
+            Debug_Printf("key = %d!\n", key);
+        }
+
+        vTaskDelayUntil(&lastWakeTime, KEY_PERIOD);
+    }
+
+  
+}
+
+
 uint8_t Com_buff[TX_PLOAD_WIDTH] = {0};
-
-
-
 //通讯任务
 void Comm_Task(void *pvParameters)
 {
@@ -52,7 +77,7 @@ void Comm_Task(void *pvParameters)
         Com_buff[5] = 'r';
 
         uint8_t r = Int_SI24R1_TxPacket(Com_buff);
-        Debug_Printf("TX ret=%d\r\n", r);   //0=对方回ACK 1=重发超限 2=超时
+       
 
         //发送完成后恢复到 RX 模式
         Int_SI24R1_RX_Mode();

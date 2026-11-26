@@ -84,13 +84,9 @@ void Comm_Task(void *pvParameters)
        
       //1.接收数据到缓存区
      uint8_t res =  Int_SI24R1_RxPacket(Com_buff);
-
-     static uint16_t cnt = 0;
-     if (++cnt % 166 == 0) Debug_Printf("waiting...\r\n");   //约每秒一次
      if(res == 0)
      {
-        //接收成功
-        Debug_Printf("RX: %c%c%c%c%c%c\r\n", Com_buff[0], Com_buff[1], Com_buff[2], Com_buff[3], Com_buff[4], Com_buff[5]);
+        printf("%s\n",Com_buff);
      }
 
 

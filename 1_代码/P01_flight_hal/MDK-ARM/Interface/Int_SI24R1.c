@@ -3,6 +3,11 @@
 uint8_t  TX_ADDRESS[TX_ADR_WIDTH] = {0x0A,0x01,0x08,0x0E,0x01};  // 定义一个静态发送地址
 
 
+/********************************************************
+函数功能：SPI读写字节                
+入口参数：byte:要读写的字节
+返回  值：读取到的字节
+*********************************************************/
 static uint8_t SPI_RW(uint8_t byte)
 {
 	uint8_t rx_data;
@@ -179,6 +184,7 @@ uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 	while((state&TX_DS)==0&&(state&MAX_RT)==0)//读取状态寄存器的值
 	{
 		state = Int_SI24R1_Read_Reg(STATUS);//没值的时候就一直读,一直读
+		vTaskDelay(1);
 
 	}  											 	   
 	Int_SI24R1_Write_Reg(SI24R1_WRITE_REG + STATUS, state); //清除TX_DS或MAX_RT中断标志
@@ -201,8 +207,11 @@ uint8_t RXBUFF[5]={0};
 //核对发送接收是否成功
 uint8_t Int_SI24R1_Check(void)
 {
+	// 1.0 SI24R1芯片需要先读取一次  保证SPI正常之后再写入
+	Int_SI24R1_Read_Buf(SI24R1_READ_REG + TX_ADDR, RXBUFF, TX_ADR_WIDTH);
+
     //写入发送地址
-	Int_SI24R1_Read_Buf(SI24R1_READ_REG + TX_ADDR, RXBUFF, TX_ADR_WIDTH);   // 先读一次（丢弃首帧）
+	
 	Int_SI24R1_Write_Buf(SI24R1_WRITE_REG + TX_ADDR, TX_ADDRESS, TX_ADR_WIDTH);
 
 	//读取同样地址
@@ -229,10 +238,8 @@ void Int_SI24R1_Init(void)
 		HAL_Delay(10);
 	}
 
-	Debug_Printf("SI24R1 Init Success!\n");
-
 	//每次默认是接收状态
 	Int_SI24R1_RX_Mode();
-	
+	Debug_Printf("SI24R1 Init Success!\n");
 }
 

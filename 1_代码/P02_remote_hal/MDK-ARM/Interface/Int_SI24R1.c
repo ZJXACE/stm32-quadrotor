@@ -170,7 +170,7 @@ uint8_t Int_SI24R1_RxPacket(uint8_t *rxbuf)
 uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 {
 	uint8_t state;
-	uint32_t t0 = HAL_GetTick();
+	
 	CE_LOW;																										  //CE拉低，使能SI24R1配置
 	Int_SI24R1_Write_Buf(WR_TX_PLOAD, txbuf, TX_PLOAD_WIDTH);	    //写数据到TX FIFO,32个字节
  	CE_HIGH;																										  //CE置高，使能发送	   
@@ -179,8 +179,9 @@ uint8_t Int_SI24R1_TxPacket(uint8_t *txbuf)
 	state = Int_SI24R1_Read_Reg(STATUS);
 	while((state&TX_DS)==0&&(state&MAX_RT)==0)//读取状态寄存器的值
 	{
-		if (HAL_GetTick() - t0 > 20) { Int_SI24R1_Write_Reg(FLUSH_TX,0xff); return 2; }  // 2 = 超时：射频可能没工作
+		
 		state = Int_SI24R1_Read_Reg(STATUS);//没值的时候就一直读,一直读
+		vTaskDelay(1);
 
 	}  											 	   
 	Int_SI24R1_Write_Reg(SI24R1_WRITE_REG + STATUS, state); //清除TX_DS或MAX_RT中断标志
