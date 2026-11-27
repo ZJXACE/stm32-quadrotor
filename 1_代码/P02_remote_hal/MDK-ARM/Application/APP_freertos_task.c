@@ -1,5 +1,7 @@
 #include "APP_freertos_task.h"
 
+Joystick_struct joystick[4]={0};
+
 //创建电源管理任务，每 10S 拉低一次电平，使得其继续工作
 void Power_Manage_Task(void *pvParameters);
 #define POWER_MANAGE_STACK_SIZE 128
@@ -18,6 +20,12 @@ void Key_Task(void *pvParameters);
 #define KEY_PRIORITYIO 2
 TaskHandle_t key_hande;
 #define KEY_PERIOD 20
+//创建摇杆任务
+void Joystick_Task(void *pvParameters);
+#define JOYSTICK_STACK_SIZE 128
+#define JOYSTICK_PRIORITYIO 2//和按键任务铜同级别
+TaskHandle_t joystick_hande;
+#define JOYSTICK_PERIOD 20
 
 
 
@@ -34,9 +42,31 @@ void App_Freertos_Start(void)
     //创建按键任务
     xTaskCreate(Key_Task, "Key_Task", KEY_STACK_SIZE, NULL, KEY_PRIORITYIO, &key_hande);
 
+    //创建摇杆任务
+    //xTaskCreate(Joystick_Task, "Joystick_Task", JOYSTICK_STACK_SIZE, NULL, JOYSTICK_PRIORITYIO, &joystick_hande);
+
     //启动任务调度器
     vTaskStartScheduler();
 }
+
+//摇杆任务
+void Joystick_Task(void *pvParameters)
+{
+    portTickType lastWakeTime = xTaskGetTickCount();
+    //初始化摇杆adc
+    Init_Joystick_Init();//开启ADC到dma,只需要一次,所以在循环外面部分
+    while(1)
+    {
+        //获取摇杆值,并打印
+        Init_Joystick_Get(joystick);
+        Debug_Printf(":%d,%d,%d,%d\n", joystick->thr, joystick->yaw, joystick->pitch, joystick->roll);
+
+
+        vTaskDelayUntil(&lastWakeTime, JOYSTICK_PERIOD);
+    }
+}
+
+
 
 //按键任务
 void Key_Task(void *pvParameters)
@@ -44,17 +74,19 @@ void Key_Task(void *pvParameters)
     portTickType lastWakeTime = xTaskGetTickCount();
     while(1)
     {
-        KEY_type key = Int_Key_Get();
-        if(key != KEY_NONE)
-        {
-            Debug_Printf("key = %d!\n", key);
-        }
+       //APP_process_keydata();
+       App_Process_KeyData();
+       //打印俯仰角offset
+       Debug_Printf(":%d,%d,%d,%d\n", key_pitch_offset, key_roll_offset, remote.Shutdown, remote.Fix_Height);
+       
+        
 
         vTaskDelayUntil(&lastWakeTime, KEY_PERIOD);
+}
     }
 
   
-}
+
 
 
 uint8_t Com_buff[TX_PLOAD_WIDTH] = {0};
