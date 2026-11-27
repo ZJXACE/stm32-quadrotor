@@ -1,6 +1,6 @@
 #include "APP_freertos_task.h"
 
-Joystick_struct joystick[4]={0};
+
 
 //创建电源管理任务，每 10S 拉低一次电平，使得其继续工作
 void Power_Manage_Task(void *pvParameters);
@@ -43,7 +43,7 @@ void App_Freertos_Start(void)
     xTaskCreate(Key_Task, "Key_Task", KEY_STACK_SIZE, NULL, KEY_PRIORITYIO, &key_hande);
 
     //创建摇杆任务
-    //xTaskCreate(Joystick_Task, "Joystick_Task", JOYSTICK_STACK_SIZE, NULL, JOYSTICK_PRIORITYIO, &joystick_hande);
+    xTaskCreate(Joystick_Task, "Joystick_Task", JOYSTICK_STACK_SIZE, NULL, JOYSTICK_PRIORITYIO, &joystick_hande);
 
     //启动任务调度器
     vTaskStartScheduler();
@@ -58,9 +58,7 @@ void Joystick_Task(void *pvParameters)
     while(1)
     {
         //获取摇杆值,并打印
-        Init_Joystick_Get(joystick);
-        Debug_Printf(":%d,%d,%d,%d\n", joystick->thr, joystick->yaw, joystick->pitch, joystick->roll);
-
+        App_Process_JoystickData();
 
         vTaskDelayUntil(&lastWakeTime, JOYSTICK_PERIOD);
     }
@@ -76,9 +74,7 @@ void Key_Task(void *pvParameters)
     {
        //APP_process_keydata();
        App_Process_KeyData();
-       //打印俯仰角offset
-       Debug_Printf(":%d,%d,%d,%d\n", key_pitch_offset, key_roll_offset, remote.Shutdown, remote.Fix_Height);
-       
+      
         
 
         vTaskDelayUntil(&lastWakeTime, KEY_PERIOD);

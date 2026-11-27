@@ -8,17 +8,18 @@
 #include "Int_Joystick.h"
 #include"Int_Key.h"
 #include"Com_debug.h"
+#include"Com_tool.h"
 
 typedef struct //发送给飞机的数据指令包or信号?
 {
     //油门
-    uint16_t thr;
+    int16_t thr;
     //偏航
-    uint16_t yaw;
+    int16_t yaw;
     //俯仰
-    uint16_t pitch;
+    int16_t pitch;
     //滚转
-    uint16_t roll;
+    int16_t roll;
     //关机
     uint8_t Shutdown;//0:不关机,1:关机
     //定高
@@ -26,9 +27,6 @@ typedef struct //发送给飞机的数据指令包or信号?
 }Remote_Data;
 
 
-extern int16_t key_pitch_offset;
-extern int16_t key_roll_offset;
-extern Remote_Data remote;
 
 
 /**
@@ -47,5 +45,6 @@ void App_Process_KeyData(void);
  */
 void App_Process_JoystickData(void);
 
-
+//校准摇杆函数,trh=0 yaw pitch roll=500;
+void App_Calibrate_Joystick(void);
 #endif

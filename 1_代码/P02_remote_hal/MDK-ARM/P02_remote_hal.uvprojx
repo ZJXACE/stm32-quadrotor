@@ -940,6 +940,16 @@
               <FileType>5</FileType>
               <FilePath>.\Common\Com_debug.h</FilePath>
             </File>
+            <File>
+              <FileName>Com_tool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Common\Com_tool.c</FilePath>
+            </File>
+            <File>
+              <FileName>Com_tool.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Common\Com_tool.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
